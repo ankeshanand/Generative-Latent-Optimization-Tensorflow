@@ -41,35 +41,37 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
 
     f = h5py.File(osp.join(data_dir, 'data.hdf5'), 'w')
     data_id = open(osp.join(data_dir, 'id.txt'), 'w')
-    for i in range(image.shape[0]):
+    sess = tf.Session()
+    with sess.as_default():
+        for i in range(image.shape[0]):
 
-        if i % (image.shape[0] / 100) == 0:
-            bar.update(i / (image.shape[0] / 100))
+            if i % (image.shape[0] / 100) == 0:
+                bar.update(i / (image.shape[0] / 100))
 
-        grp = f.create_group(str(i))
-        data_id.write(str(i)+'\n')
-        if shape:
-            grp['image'] = np.reshape(image[i], shape, order='F')
-        else:
-            grp['image'] = image[i]
+            grp = f.create_group(str(i))
+            data_id.write(str(i)+'\n')
+            if shape:
+                grp['image'] = np.reshape(image[i], shape, order='F')
+            else:
+                grp['image'] = image[i]
 
-        # sample from a distribution
-        if args.distribution == 'Uniform':
-            grp['code'] = np.random.uniform(low=-1., high=1., size=args.dimension)
-        elif args.distribution == 'Gaussian':
-            grp['code'] = np.random.randn(args.dimension)  # normal distribution
-        elif args.distribution == 'PCA':
-            grp['code'] = Y[i, :]/np.linalg.norm(Y[i, :], 2)
-        elif args.distribution == 'Mixture':
-            ds = tf.contrib.distributions
-            mix = 0.5
-            bimix_gauss = ds.Mixture(
-                cat=ds.Categorical(probs=[mix, 1. - mix]),
-                components=[
-                    ds.Normal(loc=-0.1, scale=0.1),
-                    ds.Normal(loc=+0.1, scale=0.5),
-                ])
-            grp['code'] = tf.Session().run(bimix_gauss.sample(args.dimension))
+            # sample from a distribution
+            if args.distribution == 'Uniform':
+                grp['code'] = np.random.uniform(low=-1., high=1., size=args.dimension)
+            elif args.distribution == 'Gaussian':
+                grp['code'] = np.random.randn(args.dimension)  # normal distribution
+            elif args.distribution == 'PCA':
+                grp['code'] = Y[i, :]/np.linalg.norm(Y[i, :], 2)
+            elif args.distribution == 'Mixture':
+                ds = tf.contrib.distributions
+                mix = 0.5
+                bimix_gauss = ds.Mixture(
+                    cat=ds.Categorical(probs=[mix, 1. - mix]),
+                    components=[
+                        ds.Normal(loc=-0.1, scale=0.1),
+                        ds.Normal(loc=+0.1, scale=0.5),
+                    ])
+                grp['code'] = bimix_gauss.sample(args.dimension).eval()
 
     bar.finish()
     f.close()
