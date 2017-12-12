@@ -72,12 +72,12 @@ def check_file(data_dir):
            osp.isfile(osp.join(data_dir, 'id.txt')):
             return True
     else:
-        os.mkdir(data_dir)
+        os.makedirs(data_dir)
     return False
 
 
 def download_mnist(download_path):
-    data_dir = osp.join(download_path, 'mnist')
+    data_dir = osp.join(download_path, 'mnist', args.distribution)
 
     if check_file(data_dir):
         print('MNIST was downloaded.')
@@ -197,7 +197,7 @@ def download_cifar10(download_path):
 if __name__ == '__main__':
     args = parser.parse_args()
     path = './datasets'
-    if not osp.exists(path): os.mkdir(path)
+    if not osp.exists(path): os.makedirs(path)
 
     if 'MNIST' in args.datasets:
         download_mnist('./datasets')

@@ -25,7 +25,7 @@ class Trainer(object):
                  dataset_train,
                  dataset_test):
         self.config = config
-        hyper_parameter_str = config.dataset+'_lr_'+str(config.learning_rate)
+        hyper_parameter_str = config.dataset+'_lr_'+str(config.learning_rate)+'_l2loss_'
         self.train_dir = './train_dir/%s-%s-%s' % (
             config.prefix,
             hyper_parameter_str,
@@ -223,6 +223,7 @@ def main():
     parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--lr_weight_decay', action='store_true', default=False)
     parser.add_argument('--dump_result', action='store_true', default=False)
+    parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'Mixture'])
     config = parser.parse_args()
 
     if config.dataset == 'MNIST':
@@ -236,7 +237,7 @@ def main():
 
     config.conv_info = dataset.get_conv_info()
     config.deconv_info = dataset.get_deconv_info()
-    dataset_train, dataset_test = dataset.create_default_splits()
+    dataset_train, dataset_test = dataset.create_default_splits(distribution=config.distribution)
 
     m, l = dataset_train.get_data(dataset_train.ids[0])
     config.data_info = np.concatenate([np.asarray(m.shape), np.asarray(l.shape)])

@@ -16,7 +16,7 @@ rs = np.random.RandomState(123)
 class Dataset(object):
 
     def __init__(self, ids, name='default',
-                 max_examples=None, is_train=True):
+                 max_examples=None, is_train=True, distribution=None):
         self._ids = list(ids)
         self.name = name
         self.is_train = is_train
@@ -26,7 +26,7 @@ class Dataset(object):
 
         filename = 'data.hdf5'
 
-        file = os.path.join(__PATH__, filename)
+        file = os.path.join(__PATH__, distribution, filename)
         log.info("Reading %s ...", file)
 
         try:
@@ -73,25 +73,25 @@ def get_deconv_info():
     return np.array([[100, 4, 2], [50, 4, 2], [25, 4, 2], [6, 4, 2], [1, 4, 2]])
 
 
-def create_default_splits(is_train=True):
-    ids = all_ids()
+def create_default_splits(is_train=True, distribution=None):
+    ids = all_ids(distribution=distribution)
 
     num_trains = 60000
 
-    dataset_train = Dataset(ids[:num_trains], name='train', is_train=False)
-    dataset_test = Dataset(ids[num_trains:], name='test', is_train=False)
+    dataset_train = Dataset(ids[:num_trains], distribution=distribution, name='train', is_train=False)
+    dataset_test = Dataset(ids[num_trains:], distribution=distribution, name='test', is_train=False)
     return dataset_train, dataset_test
 
 
-def all_ids():
+def all_ids(distribution=None):
     id_filename = 'id.txt'
 
-    id_txt = os.path.join(__PATH__, id_filename)
+    id_txt = os.path.join(__PATH__, distribution, id_filename)
     try:
         with open(id_txt, 'r') as fp:
             _ids = [s.strip() for s in fp.readlines() if s]
     except:
-        raise IOError('Dataset not found. Please make sure the dataset was downloaded.')
+        raise IOError('Dataset not found. Please make sure the dat set was downloaded.')
 
     rs.shuffle(_ids)
     return _ids
