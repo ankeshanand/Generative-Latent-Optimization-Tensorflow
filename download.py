@@ -88,7 +88,7 @@ def check_file(data_dir):
 
 
 def download_mnist(download_path):
-    data_dir = osp.join(download_path, 'mnist', args.distribution, args.dimension)
+    data_dir = osp.join(download_path, 'mnist', args.distribution, str(args.dimension))
 
     if check_file(data_dir):
         print('MNIST was downloaded.')

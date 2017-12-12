@@ -26,7 +26,7 @@ class Dataset(object):
 
         filename = 'data.hdf5'
 
-        file = os.path.join(__PATH__, distribution, dimension, filename)
+        file = os.path.join(__PATH__, distribution, str(dimension), filename)
         log.info("Reading %s ...", file)
 
         try:
