@@ -115,11 +115,14 @@ class Model(object):
         # Build loss {{{
         # =========
         # self.loss = tf.reduce_mean(tf.abs(self.x - self.x_recon))
-        self.loss = tf.reduce_mean(tf.squared_difference(self.x, self.x_recon))
 
+        self.l2_loss = tf.reduce_mean(tf.squared_difference(self.x, self.x_recon))
+
+        self.prior_loss = 0
         if self.distribution == 'Gaussian':
-            self.loss -= tf.reduce_mean(tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z))
+            self.prior_loss -= tf.reduce_mean(tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z))
 
+        self.loss = self.l2_loss + self.prior_loss
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
 

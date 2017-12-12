@@ -116,11 +116,11 @@ class Trainer(object):
         output_save_step = 1000
 
         for s in xrange(max_steps):
-            step, summary, x, loss, loss_g_update, loss_z_update, step_time = \
+            step, summary, x, loss, l2_loss, loss_g_update, loss_z_update, step_time = \
                 self.run_single_step(self.batch_train, dataset, step=s, is_train=True)
 
             if s % 10 == 0:
-                self.log_step_message(step, loss, loss_g_update, loss_z_update, step_time)
+                self.log_step_message(step, loss, l2_loss, loss_g_update, loss_z_update, step_time)
 
             self.summary_writer.add_summary(summary, global_step=step)
 
@@ -141,13 +141,13 @@ class Trainer(object):
 
         # Optmize the generator {{{
         # ========
-        fetch = [self.global_step, self.summary_op, self.model.loss,
+        fetch = [self.global_step, self.summary_op, self.model.loss, self.model.l2_loss,
                  self.model.x_recon, self.check_op, self.g_optimizer]
 
         fetch_values = self.session.run(
             fetch, feed_dict=self.model.get_feed_dict(batch_chunk, step=step)
         )
-        [step, summary, loss, x] = fetch_values[:4]
+        [step, summary, loss, l2_loss, x] = fetch_values[:5]
         # }}}
 
         # Optimize the latent vectors {{{
@@ -177,7 +177,7 @@ class Trainer(object):
 
         _end_time = time.time()
 
-        return step, summary, x, loss, loss_g_update, loss_z_update, (_end_time - _start_time)
+        return step, summary, x, loss, l2_loss, loss_g_update, loss_z_update, (_end_time - _start_time)
 
     def run_test(self, batch, is_train=False, repeat_times=8):
 
@@ -189,19 +189,21 @@ class Trainer(object):
 
         return loss
 
-    def log_step_message(self, step, loss, loss_g_update,
+    def log_step_message(self, step, loss, l2_loss, loss_g_update,
                          loss_z_update, step_time, is_train=True):
         if step_time == 0:
             step_time = 0.001
         log_fn = (is_train and log.info or log.infov)
         log_fn((" [{split_mode:5s} step {step:4d}] " +
                 "Loss: {loss:.5f} " +
+                "L2 Loss: {l2_loss:.5f} " +
                 "G update: {loss_g_update:.5f} " +
                 "Z update: {loss_z_update:.5f} " +
                 "({sec_per_batch:.3f} sec/batch, {instance_per_sec:.3f} instances/sec) "
                 ).format(split_mode=(is_train and 'train' or 'val'),
                          step=step,
                          loss=loss,
+                         l2_loss=l2_loss,
                          loss_z_update=loss_z_update,
                          loss_g_update=loss_g_update,
                          sec_per_batch=step_time,
