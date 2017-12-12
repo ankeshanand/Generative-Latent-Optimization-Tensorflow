@@ -126,7 +126,7 @@ class Model(object):
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
 
-        tf.summary.scalar("loss/loss", self.loss)
+        tf.summary.scalar("loss/l2_loss", self.l2_loss)
         tf.summary.image("img/reconstructed", self.x_recon, max_outputs=4)
         tf.summary.image("img/real", self.x, max_outputs=4)
         print('\033[93mSuccessfully loaded the model.\033[0m')
