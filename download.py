@@ -64,9 +64,9 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
             a = [0, 1]
             choice = np.random.choice(a)
             if choice == 0:
-                grp['code'] = np.random.normal(loc=-0.1, scale=0.5)
+                grp['code'] = np.random.normal(loc=-0.1, scale=0.5, size=args.dimension)
             else:
-                grp['code'] = np.random.normal(loc=0.1, scale=0.2)
+                grp['code'] = np.random.normal(loc=0.1, scale=0.2, size=args.dimension)
 
     bar.finish()
     f.close()
