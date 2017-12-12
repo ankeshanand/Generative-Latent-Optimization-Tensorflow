@@ -11,7 +11,7 @@ import tensorflow as tf
 parser = argparse.ArgumentParser(description='Download dataset for GLO.')
 parser.add_argument('--datasets', metavar='N', type=str, nargs='+', choices=['MNIST', 'SVHN', 'CIFAR10'])
 parser.add_argument('--dimension', type=int, default=100)
-parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'PCA', 'Mixture'])
+parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'PCA', 'Mixture', 'Gamma', 'Beta'])
 
 
 def pca_feature(X, d):
@@ -67,6 +67,11 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
                 grp['code'] = np.random.normal(loc=-0.1, scale=0.5, size=args.dimension)
             else:
                 grp['code'] = np.random.normal(loc=0.1, scale=0.2, size=args.dimension)
+        elif args.distribution == 'Gamma':
+            grp['code'] = np.random.gamma(shape=2., scale=2., size=args.dimension)
+
+        elif args.distribution == 'Beta':
+            grp['code'] = np.random.beta(a=2., b=2., size=args.dimension)
 
     bar.finish()
     f.close()

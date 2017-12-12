@@ -164,7 +164,7 @@ class Trainer(object):
             norm = np.sqrt(np.sum(z_updated ** 2, axis=1))
             z_updated = z_updated / norm[:, np.newaxis]
 
-        elif self.distribution == 'Gaussian' or self.distribution == 'Mixture':
+        else:
             z_updated = z - self.config.alpha * z_grad[0]
 
         loss_z_update = self.session.run(
@@ -230,7 +230,7 @@ def main():
     parser.add_argument('--alpha', type=float, default=1.0)
     parser.add_argument('--lr_weight_decay', action='store_true', default=False)
     parser.add_argument('--dump_result', action='store_true', default=False)
-    parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'Mixture'])
+    parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'Mixture', 'Gamma', 'Beta'])
     parser.add_argument('--dimension', type=int, default=100)
     config = parser.parse_args()
 

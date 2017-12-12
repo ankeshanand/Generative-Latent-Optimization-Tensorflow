@@ -133,6 +133,12 @@ class Model(object):
                 ])
             self.prior_loss -= tf.reduce_mean(bimix_gauss.log_prob(self.z))
 
+        elif self.distribution == 'Gamma':
+            self.prior_loss -= tf.reduce_mean(tf.distributions.Gamma(concentration=2.0, rate=2.0).log_prob(self.z))
+
+        elif self.distribution == 'Beta':
+            self.prior_loss -= tf.reduce_mean(tf.distributions.Beta(concentration1=2., concentration0=.2).log_prob(self.z))
+
         self.loss = self.l2_loss + self.prior_loss
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
