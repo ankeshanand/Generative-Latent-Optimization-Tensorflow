@@ -118,7 +118,7 @@ class Model(object):
         self.loss = tf.reduce_mean(tf.squared_difference(self.x, self.x_recon))
 
         if self.distribution == 'Gaussian':
-            self.loss -= tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z)
+            self.loss -= tf.reduce_mean(tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z))
 
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
