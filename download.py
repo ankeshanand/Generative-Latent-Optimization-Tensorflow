@@ -41,7 +41,10 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
 
     f = h5py.File(osp.join(data_dir, 'data.hdf5'), 'w')
     data_id = open(osp.join(data_dir, 'id.txt'), 'w')
-    sess = tf.Session()
+    config = tf.ConfigProto(
+        device_count={'GPU': 0}
+    )
+    sess = tf.Session(config=config)
     with sess.as_default():
         for i in range(image.shape[0]):
 
