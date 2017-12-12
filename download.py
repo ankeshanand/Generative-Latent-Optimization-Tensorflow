@@ -46,6 +46,14 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
     )
     sess = tf.Session(config=config)
     with tf.device("/cpu:0"):
+        ds = tf.contrib.distributions
+        mix = 0.5
+        bimix_gauss = ds.Mixture(
+            cat=ds.Categorical(probs=[mix, 1. - mix]),
+            components=[
+                ds.Normal(loc=-0.1, scale=0.1),
+                ds.Normal(loc=+0.1, scale=0.5),
+            ])
         for i in range(image.shape[0]):
 
             if i % (image.shape[0] / 100) == 0:
@@ -66,14 +74,6 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
             elif args.distribution == 'PCA':
                 grp['code'] = Y[i, :]/np.linalg.norm(Y[i, :], 2)
             elif args.distribution == 'Mixture':
-                ds = tf.contrib.distributions
-                mix = 0.5
-                bimix_gauss = ds.Mixture(
-                    cat=ds.Categorical(probs=[mix, 1. - mix]),
-                    components=[
-                        ds.Normal(loc=-0.1, scale=0.1),
-                        ds.Normal(loc=+0.1, scale=0.5),
-                    ])
                 grp['code'] = sess.run(bimix_gauss.sample(args.dimension))
 
     bar.finish()
