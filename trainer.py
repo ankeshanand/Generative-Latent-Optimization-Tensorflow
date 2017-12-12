@@ -164,9 +164,8 @@ class Trainer(object):
             norm = np.sqrt(np.sum(z_updated ** 2, axis=1))
             z_updated = z_updated / norm[:, np.newaxis]
 
-        elif self.distribution == 'Gaussian':
+        elif self.distribution == 'Gaussian' or self.distribution == 'Mixture':
             z_updated = z - self.config.alpha * z_grad[0]
-
 
         loss_z_update = self.session.run(
             self.model.loss, feed_dict={self.model.x: batch_chunk['image'], self.model.z: z_updated}
