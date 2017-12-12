@@ -38,7 +38,7 @@ class Trainer(object):
 
         # --- input ops ---
         self.batch_size = config.batch_size
-        self.distribution = config.distrubution
+        self.distribution = config.distribution
 
         _, self.batch_train = create_input_ops(dataset_train, self.batch_size,
                                                is_training=True)
