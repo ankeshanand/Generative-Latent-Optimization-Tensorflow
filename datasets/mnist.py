@@ -86,7 +86,7 @@ def create_default_splits(is_train=True, distribution=None, dimension=None):
 def all_ids(distribution=None, dimension=None):
     id_filename = 'id.txt'
 
-    id_txt = os.path.join(__PATH__, distribution, dimension, id_filename)
+    id_txt = os.path.join(__PATH__, distribution, str(dimension), id_filename)
     try:
         with open(id_txt, 'r') as fp:
             _ids = [s.strip() for s in fp.readlines() if s]
