@@ -25,11 +25,11 @@ class Trainer(object):
                  dataset_train,
                  dataset_test):
         self.config = config
-        hyper_parameter_str = config.dataset+'_lr_'+str(config.learning_rate)+'_l2loss_'+str(config.distribution)
+        hyper_parameter_str = config.dataset+'_l2loss_'+str(config.distribution)+str(config.dimension)
         self.train_dir = './train_dir/%s-%s-%s' % (
             config.prefix,
             hyper_parameter_str,
-            time.strftime("%Y%m%d-%H%M%S")
+            time.strftime("%m%d-%H%M%S")
         )
 
         if not os.path.exists(self.train_dir):
@@ -232,6 +232,7 @@ def main():
     parser.add_argument('--lr_weight_decay', action='store_true', default=False)
     parser.add_argument('--dump_result', action='store_true', default=False)
     parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'Mixture'])
+    parser.add_argument('--dimension', type=int, default=100)
     config = parser.parse_args()
 
     if config.dataset == 'MNIST':
@@ -245,7 +246,8 @@ def main():
 
     config.conv_info = dataset.get_conv_info()
     config.deconv_info = dataset.get_deconv_info()
-    dataset_train, dataset_test = dataset.create_default_splits(distribution=config.distribution)
+    dataset_train, dataset_test = dataset.create_default_splits(distribution=config.distribution,
+                                                                dimension=config.dimension)
 
     m, l = dataset_train.get_data(dataset_train.ids[0])
     config.data_info = np.concatenate([np.asarray(m.shape), np.asarray(l.shape)])

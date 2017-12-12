@@ -6,6 +6,7 @@ import subprocess
 import argparse
 import h5py
 import numpy as np
+import tensorflow as tf
 
 parser = argparse.ArgumentParser(description='Download dataset for GLO.')
 parser.add_argument('--datasets', metavar='N', type=str, nargs='+', choices=['MNIST', 'SVHN', 'CIFAR10'])
@@ -54,11 +55,21 @@ def prepare_h5py(train_image, test_image, data_dir, shape=None):
 
         # sample from a distribution
         if args.distribution == 'Uniform':
-            grp['code'] = np.random.random(args.dimension) * 2 - 1  # normal distribution
+            grp['code'] = np.random.uniform(low=-1., high=1., size=args.dimension)
         elif args.distribution == 'Gaussian':
             grp['code'] = np.random.randn(args.dimension)  # normal distribution
         elif args.distribution == 'PCA':
             grp['code'] = Y[i, :]/np.linalg.norm(Y[i, :], 2)
+        elif args.distribution == 'Mixture':
+            ds = tf.contrib.distributions
+            mix = 0.5
+            bimix_gauss = ds.Mixture(
+                cat=ds.Categorical(probs=[mix, 1. - mix]),
+                components=[
+                    ds.Normal(loc=-0.1, scale=0.1),
+                    ds.Normal(loc=+0.1, scale=0.5),
+                ])
+            grp['code'] = tf.Session().run(bimix_gauss.sample(args.dimension))
 
     bar.finish()
     f.close()
@@ -77,7 +88,7 @@ def check_file(data_dir):
 
 
 def download_mnist(download_path):
-    data_dir = osp.join(download_path, 'mnist', args.distribution)
+    data_dir = osp.join(download_path, 'mnist', args.distribution, args.dimension)
 
     if check_file(data_dir):
         print('MNIST was downloaded.')

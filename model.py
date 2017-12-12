@@ -120,13 +120,22 @@ class Model(object):
 
         self.prior_loss = 0
         if self.distribution == 'Gaussian':
-            self.prior_loss -= tf.reduce_mean(tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z))
+            self.prior_loss -= tf.reduce_mean(tf.distributions.Normal(loc=0., scale=1.).log_prob(self.z))
+
+        elif self.distribution == 'Mixture':
+            ds = tf.contrib.distributions
+            mix = 0.5
+            bimix_gauss = ds.Mixture(
+                cat=ds.Categorical(probs=[mix, 1. - mix]),
+                components=[
+                    ds.Normal(loc=-0.1, scale=0.1),
+                    ds.Normal(loc=+0.1, scale=0.5),
+                ])
+            self.prior_loss -= tf.reduce_mean(bimix_gauss.log_prob(self.z))
 
         self.loss = self.l2_loss + self.prior_loss
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
 
         tf.summary.scalar("loss/l2_loss", self.l2_loss)
-        tf.summary.image("img/reconstructed", self.x_recon, max_outputs=4)
-        tf.summary.image("img/real", self.x, max_outputs=4)
         print('\033[93mSuccessfully loaded the model.\033[0m')
