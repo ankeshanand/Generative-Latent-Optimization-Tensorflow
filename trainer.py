@@ -38,6 +38,7 @@ class Trainer(object):
 
         # --- input ops ---
         self.batch_size = config.batch_size
+        self.distribution = config.distrubution
 
         _, self.batch_train = create_input_ops(dataset_train, self.batch_size,
                                                is_training=True)
@@ -158,15 +159,20 @@ class Trainer(object):
 
         [z, z_grad, loss_g_update] = fetch_values
 
-        z_update = z - self.config.alpha * z_grad[0]
-        norm = np.sqrt(np.sum(z_update ** 2, axis=1))
-        z_update_norm = z_update / norm[:, np.newaxis]
+        if self.distribution == 'Uniform':
+            z_updated = z - self.config.alpha * z_grad[0]
+            norm = np.sqrt(np.sum(z_updated ** 2, axis=1))
+            z_updated = z_updated / norm[:, np.newaxis]
+
+        elif self.distribution == 'Gaussian':
+            z_updated = z - self.config.alpha * z_grad[0]
+
 
         loss_z_update = self.session.run(
-            self.model.loss, feed_dict={self.model.x: batch_chunk['image'], self.model.z: z_update_norm}
+            self.model.loss, feed_dict={self.model.x: batch_chunk['image'], self.model.z: z_updated}
         )
         for i in range(len(batch_chunk['id'])):
-            dataset.set_data(batch_chunk['id'][i], z_update_norm[i, :])
+            dataset.set_data(batch_chunk['id'][i], z_updated[i, :])
         # }}}
 
         _end_time = time.time()

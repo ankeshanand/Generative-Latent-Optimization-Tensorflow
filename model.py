@@ -21,6 +21,7 @@ class Model(object):
         self.d_dim = self.config.data_info[3]
         self.deconv_info = self.config.deconv_info
         self.conv_info = self.config.conv_info
+        self.distribution = config.distribution
 
         # create placeholders for the input
         self.image = tf.placeholder(
@@ -114,7 +115,11 @@ class Model(object):
         # Build loss {{{
         # =========
         # self.loss = tf.reduce_mean(tf.abs(self.x - self.x_recon))
-        self.loss = local_moment_loss(self.x, self.x_recon)
+        self.loss = tf.reduce_mean(tf.squared_difference(self.x, self.x_recon))
+
+        if self.distribution == 'Gaussian':
+            self.loss -= tf.distributions.Normal(loc=0., scale=3.).log_prob(self.z)
+
         self.z_grad = tf.gradients(self.loss, self.z)
         # }}}
 
