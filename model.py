@@ -128,8 +128,8 @@ class Model(object):
             bimix_gauss = ds.Mixture(
                 cat=ds.Categorical(probs=[mix, 1. - mix]),
                 components=[
-                    ds.Normal(loc=-0.1, scale=0.1),
-                    ds.Normal(loc=+0.1, scale=0.5),
+                    ds.Normal(loc=-0.1, scale=0.5),
+                    ds.Normal(loc=+0.1, scale=0.2),
                 ])
             self.prior_loss -= tf.reduce_mean(bimix_gauss.log_prob(self.z))
 
