@@ -25,7 +25,7 @@ class Trainer(object):
                  dataset_train,
                  dataset_test):
         self.config = config
-        hyper_parameter_str = config.dataset+'_lr_'+str(config.learning_rate)+'_l2loss_'
+        hyper_parameter_str = config.dataset+'_lr_'+str(config.learning_rate)+'_l2loss_'+str(config.distribution)
         self.train_dir = './train_dir/%s-%s-%s' % (
             config.prefix,
             hyper_parameter_str,
