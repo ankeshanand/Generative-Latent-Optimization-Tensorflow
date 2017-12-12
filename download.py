@@ -11,7 +11,7 @@ import tensorflow as tf
 parser = argparse.ArgumentParser(description='Download dataset for GLO.')
 parser.add_argument('--datasets', metavar='N', type=str, nargs='+', choices=['MNIST', 'SVHN', 'CIFAR10'])
 parser.add_argument('--dimension', type=int, default=100)
-parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'PCA'])
+parser.add_argument('--distribution', type=str, default='Uniform', choices=['Uniform', 'Gaussian', 'PCA', 'Mixture'])
 
 
 def pca_feature(X, d):
